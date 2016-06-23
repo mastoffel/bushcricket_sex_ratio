@@ -1,0 +1,28 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1466624657307.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "17F1A1DB",
+    "lastKnownWriteTime" : 0,
+    "last_content_update" : 1466624657307,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "tolxzo06wy",
+        "caption" : "morphometrics",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=morphometrics&cache_key=tolxzo06wy",
+        "displayedObservations" : "528",
+        "environment" : "",
+        "object" : "morphometrics",
+        "totalObservations" : "528",
+        "variables" : "7"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

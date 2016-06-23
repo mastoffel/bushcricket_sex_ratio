@@ -1,0 +1,28 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1466625826277.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "E95EC2E8",
+    "lastKnownWriteTime" : 4329630208,
+    "last_content_update" : 1466625826277,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "2zlosnl4se",
+        "caption" : "mating2",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=mating2&cache_key=2zlosnl4se",
+        "displayedObservations" : "78",
+        "environment" : "",
+        "object" : "mating2",
+        "totalObservations" : "78",
+        "variables" : "4"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

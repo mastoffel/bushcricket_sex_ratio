@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "library(dplyr)\n\n# load data\ncensus <- read.csv(\"data/raw/census_data.csv\")\nmorphometrics <- read.csv(\"data/raw/morphometric_data.csv\")\n\n# load mating and add treatment\nmating <- read.csv(\"data/raw/mating_data.csv\", stringsAsFactors = FALSE, na.strings = \"\") %>% \n    mutate(sex_ratio = as.factor(ifelse(Population == \"A\" | Population == \"E\" | Population == \"G\", 0.5,\n        ifelse(Population == \"B\" | Population == \"F\" | Population == \"H\", 0.75, 0.25))))\n\n\nstr(mating)\n\nmating2 <- mating %>% \n                group_by(sex_ratio, Population, Day_of_1st_session) %>%\n                summarise(matings = sum(Mating, na.rm = TRUE)) \n\nlibrary(ggplot2)\nd <- ggplot(mating2, aes(as.factor(Day_of_1st_session), matings, colour = sex_ratio)) + geom_point()\nd + stat_summary(fun.data = \"mean_cl_boot\", size = 1)\n\nmating3 <-  mating %>% \n    group_by(sex_ratio) %>%\n    summarise(matings = sum(Mating, na.rm = TRUE)) \n",
+    "created" : 1466624771429.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2026719266",
+    "id" : "2E1885D3",
+    "lastKnownWriteTime" : 1466684633,
+    "last_content_update" : 1466684633943,
+    "path" : "~/Dropbox/projects/current/bushcricket_sex_ratio/R/exploration.R",
+    "project_path" : "R/exploration.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
