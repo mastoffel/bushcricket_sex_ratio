@@ -55,8 +55,8 @@ library(ggthemes)
 library(ggplot2)
 library(ggrepel)
 
-d <- ggplot(mating_over_time, aes(x = sex_ratio, y = matings)) 
-d + geom_boxplot(outlier.shape = NA, lwd = 0.5) + 
+d <- ggplot(mating_over_time, aes(x = sex_ratio, y = matings)) + 
+    geom_boxplot(outlier.shape = NA, lwd = 0.5) + 
     geom_jitter(aes(color = population), alpha = 0.7, size = 2) +
     scale_y_continuous(breaks=0:9) +
     #stat_summary(fun.y=mean, colour="red", geom="point", 
@@ -69,6 +69,14 @@ d + geom_boxplot(outlier.shape = NA, lwd = 0.5) +
         axis.title.y=element_text(margin=margin(0,20,0,0)),
         axis.title.x=element_text(margin=margin(20,0,0,0)))
 
+ggplot2::ggsave(d, 
+    filename = "matings_per_sexratio.jpg", 
+    #  path = "D:/recent R",
+    width = 14,
+    scale = 0.6,
+    height = 9, units = "in",
+    dpi = 300)
+
    # geom_text(data = means, aes(label = matings, y = matings - 0.5))
 just_mating <- mating %>% filter(mating == 1) %>%
                 mutate(time_of_day = ifelse(time > 1000, "21-24", (ifelse((time > 0 & time < 300), "0-3", "3-6"))))
@@ -76,8 +84,8 @@ just_mating <- mating %>% filter(mating == 1) %>%
 just_mating$time_of_day <- as.factor(just_mating$time_of_day )
 just_mating$time_of_day <- factor(just_mating$time_of_day ,levels(just_mating$time_of_day )[c(2,1,3)])
 
-d <- ggplot(just_mating, aes(sex_ratio)) 
-d + geom_bar(aes(fill=time_of_day)) +
+d <- ggplot(just_mating, aes(sex_ratio)) + 
+    geom_bar(aes(fill=time_of_day)) +
     xlab("sex ratio") +
     ylab("overall number of matings") +
     theme_classic() +
@@ -86,6 +94,13 @@ d + geom_bar(aes(fill=time_of_day)) +
         axis.title.y=element_text(margin=margin(0,20,0,0)),
         axis.title.x=element_text(margin=margin(20,0,0,0)))
 
+ggplot2::ggsave(d, 
+    filename = "overall_matings.jpg", 
+    #  path = "D:/recent R",
+    width = 14,
+    scale = 0.6,
+    height = 9, units = "in",
+    dpi = 300)
 
 library(ggplot2)
 d <- ggplot(mating_over_time, aes(session_day, matings, colour = sex_ratio)) + 
@@ -101,6 +116,14 @@ d <- ggplot(mating_over_time, aes(session_day, matings, colour = sex_ratio)) +
         axis.title.y=element_text(margin=margin(0,20,0,0)),
         axis.title.x=element_text(margin=margin(20,0,0,0)))
 d
+
+ggplot2::ggsave(d, 
+    filename = "matings_over_time.jpg", 
+    #  path = "D:/recent R",
+    width = 14,
+    scale = 0.6,
+    height = 9, units = "in",
+    dpi = 300)
 
 # census data
 # census <- census %>% mutate(session_day = as.factor(session_day))
@@ -135,6 +158,14 @@ d <- ggplot(census_summary, aes(session_day, num_ind, colour = sex_ratio)) +
         panel.margin = unit(1.5, "lines"))
 d
 
+ggplot2::ggsave(d, 
+    filename = "census_absolute.jpg", 
+    #  path = "D:/recent R",
+    width = 14,
+    scale = 0.6,
+    height = 9, units = "in",
+    dpi = 300)
+
 # relative sex-specific_dispersal
 census_summary$rel_num_ind <- NA
 for (sex in c("M", "F")) {
@@ -162,3 +193,11 @@ d <- ggplot(census_summary, aes(session_day, rel_num_ind, colour = sex_ratio)) +
         strip.background = element_rect(colour="white"),
         panel.margin = unit(1.5, "lines"))
 d
+
+ggplot2::ggsave(d, 
+    filename = "census_relative.jpg", 
+    #  path = "D:/recent R",
+    width = 14,
+    scale = 0.6,
+    height = 9, units = "in",
+    dpi = 300)
