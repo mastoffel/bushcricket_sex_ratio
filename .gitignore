@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
+.gitignore
+.bushcricket_sex_ratio.Rproj
