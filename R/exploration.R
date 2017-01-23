@@ -1,5 +1,6 @@
 library(dplyr)
 
+library(wesanderson)
 ## morphometrics data
 morphometrics <- read.csv("data/raw/morphometric_data.csv") %>% 
                         mutate(popid = paste0(Population, ID)) %>% # creates unique id
@@ -63,6 +64,7 @@ d <- ggplot(mating_over_time, aes(x = sex_ratio, y = matings)) +
     #     size=3) +
     xlab("sex ratio") +
     ylab("number of matings per night") +
+    # scale_color_manual(values = wes_palette("GrandBudapest")) + 
     theme_classic() +
     theme(axis.line.x = element_line(colour = 'grey', size=0.5, linetype='solid'),
         axis.line.y = element_line(colour = 'grey', size=0.5, linetype='solid'),
@@ -92,7 +94,8 @@ d <- ggplot(just_mating, aes(sex_ratio)) +
     theme(axis.line.x = element_line(colour = 'grey', size=0.5, linetype='solid'),
         axis.line.y = element_line(colour = 'grey', size=0.5, linetype='solid'),
         axis.title.y=element_text(margin=margin(0,20,0,0)),
-        axis.title.x=element_text(margin=margin(20,0,0,0)))
+        axis.title.x=element_text(margin=margin(20,0,0,0))) +
+    scale_fill_manual(values = wes_palette("Chevalier")) 
 
 ggplot2::ggsave(d, 
     filename = "overall_matings.jpg", 
@@ -104,8 +107,8 @@ ggplot2::ggsave(d,
 
 library(ggplot2)
 d <- ggplot(mating_over_time, aes(session_day, matings, colour = sex_ratio)) + 
-     stat_summary(fun.y = "sum", size = 0.7, geom = "line") +
-    stat_summary(fun.y = "sum", size = 1.8, geom = "point") +
+     stat_summary(fun.y = "sum", size = 0.5, geom = "line") +
+    stat_summary(fun.y = "sum", size = 2, geom = "point") +
     scale_x_continuous(breaks=6:18) +
     scale_y_continuous(breaks=0:12) +
     xlab("session date") +
@@ -114,16 +117,72 @@ d <- ggplot(mating_over_time, aes(session_day, matings, colour = sex_ratio)) +
     theme(axis.line.x = element_line(colour = 'grey', size=0.5, linetype='solid'),
         axis.line.y = element_line(colour = 'grey', size=0.5, linetype='solid'),
         axis.title.y=element_text(margin=margin(0,20,0,0)),
-        axis.title.x=element_text(margin=margin(20,0,0,0)))
+        axis.title.x=element_text(margin=margin(20,0,0,0))) +
+    scale_color_manual(values = wes_palette("Darjeeling")) 
 d
 
 ggplot2::ggsave(d, 
-    filename = "matings_over_time.jpg", 
+    filename = "overall_matings.jpg", 
     #  path = "D:/recent R",
     width = 14,
     scale = 0.6,
     height = 9, units = "in",
     dpi = 300)
+
+# normalize number of mating by number of individuals
+num_ind_per_treatment <- census %>% 
+                            group_by(session_day, sex_ratio) %>%
+                            summarise(n= n()) %>%
+                            arrange(session_day, sex_ratio)
+num_ind_per_treatment <- num_ind_per_treatment[-nrow(num_ind_per_treatment), ]
+
+sum_mating <- mating_over_time %>% 
+                    group_by(sex_ratio, session_day) %>%
+                    summarise(matings = sum(matings)) %>%
+                    arrange(session_day, sex_ratio)
+
+sum_mating$n <- num_ind_per_treatment$n
+
+sum_mating <- sum_mating %>% 
+                    mutate(mating_per_ind = round(matings/n, 3))
+
+# relative mating
+
+d <- ggplot(sum_mating, aes(session_day, mating_per_ind, colour = sex_ratio)) + 
+    stat_summary(fun.y = "sum", size = 0.5, geom = "line") +
+    stat_summary(fun.y = "sum", size = 2, geom = "point") +
+    scale_x_continuous(breaks=6:18) +
+   # scale_y_continuous(breaks=0:12) +
+    xlab("session date") +
+    ylab("matings per individual") +
+    theme_classic() +
+    theme(axis.line.x = element_line(colour = 'grey', size=0.5, linetype='solid'),
+        axis.line.y = element_line(colour = 'grey', size=0.5, linetype='solid'),
+        axis.title.y=element_text(margin=margin(0,20,0,0)),
+        axis.title.x=element_text(margin=margin(20,0,0,0))) +
+    scale_color_manual(values = wes_palette("Darjeeling")) 
+d
+
+ggplot2::ggsave(d, 
+    filename = "relative_matings.jpg", 
+    #  path = "D:/recent R",
+    width = 14,
+    scale = 0.6,
+    height = 9, units = "in",
+    dpi = 300)
+
+# sort and add
+
+
+
+
+# ggplot2::ggsave(d, 
+#     filename = "matings_over_time.jpg", 
+#     #  path = "D:/recent R",
+#     width = 14,
+#     scale = 0.6,
+#     height = 9, units = "in",
+#     dpi = 300)
 
 # census data
 # census <- census %>% mutate(session_day = as.factor(session_day))
@@ -141,8 +200,8 @@ labels <- c(F = "Females", M = "Males")
 sp + facet_grid(. ~ sex, labeller=labeller(sex = labels))
 
 d <- ggplot(census_summary, aes(session_day, num_ind, colour = sex_ratio)) + 
-     geom_point(size = 1.8) + 
-     stat_summary(fun.y = "sum", size = 0.7, geom = "line") +
+     geom_point(size = 2) + 
+     stat_summary(fun.y = "sum", size = 0.5, geom = "line") +
      facet_wrap(~ sex, labeller=labeller(sex = labels)) +
     scale_x_continuous(breaks=seq(from = 6, to = 18, by = 2)) +
     scale_y_continuous(breaks=seq(from = 0, to = 90, by = 10)) +
@@ -155,7 +214,8 @@ d <- ggplot(census_summary, aes(session_day, num_ind, colour = sex_ratio)) +
         axis.title.x=element_text(margin=margin(20,0,0,0)),
         strip.text.x = element_text(size=13, face="bold" ),
         strip.background = element_rect(colour="white"),
-        panel.margin = unit(1.5, "lines"))
+        panel.margin = unit(1.5, "lines")) +
+    scale_color_manual(values = wes_palette("Darjeeling2")) 
 d
 
 ggplot2::ggsave(d, 
@@ -177,8 +237,8 @@ for (sex in c("M", "F")) {
 }
 
 d <- ggplot(census_summary, aes(session_day, rel_num_ind, colour = sex_ratio)) +  
-    geom_point(size = 1.8) + 
-    stat_summary(fun.y = "sum", size = 0.7, geom = "line") +
+    geom_point(size = 2) + 
+    stat_summary(fun.y = "sum", size = 0.5, geom = "line") +
     facet_wrap(~ sex, labeller=labeller(sex = labels)) +
     scale_x_continuous(breaks=seq(from = 6, to = 18, by = 2)) +
     #scale_y_continuous(breaks=seq(from = 0, to = 90, by = 10)) +
@@ -191,7 +251,8 @@ d <- ggplot(census_summary, aes(session_day, rel_num_ind, colour = sex_ratio)) +
         axis.title.x=element_text(margin=margin(20,0,0,0)),
         strip.text.x = element_text(size=13, face="bold" ),
         strip.background = element_rect(colour="white"),
-        panel.margin = unit(1.5, "lines"))
+        panel.margin = unit(1.5, "lines")) +
+    scale_color_manual(values = wes_palette("Darjeeling2")) 
 d
 
 ggplot2::ggsave(d, 
@@ -201,3 +262,12 @@ ggplot2::ggsave(d,
     scale = 0.6,
     height = 9, units = "in",
     dpi = 300)
+
+
+
+
+
+## number of matings / population size against sex ratio plot 
+
+
+
