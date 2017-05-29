@@ -1,18 +1,21 @@
 library(dplyr)
-
+library(tibble)
+library(readr)
 library(wesanderson)
 ## morphometrics data
-morphometrics <- read.csv("data/raw/morphometric_data.csv") %>% 
+morphometrics <- read_csv("data/raw/morphometric_data.csv") %>% 
                         mutate(popid = paste0(Population, ID)) %>% # creates unique id
                         mutate(Sex = as.character(Sex))
+
 # load census 
-census <- read.csv("data/raw/census_data.csv") %>% 
-                        rename(session_day = Date_of_1st_session) %>% 
+census <- read_csv("data/raw/census_data.csv") %>% 
+                        #rename(session_day = Date_of_1st_session) %>% 
                         mutate(popid = paste0(Population, ID)) %>% 
                         mutate(sex_ratio = as.factor(ifelse(Population == "A" | Population == "E" | Population == "G", 0.5,
                         ifelse(Population == "B" | Population == "F" | Population == "H", 0.75, 0.25))))# creates unique id
-                        census[is.na(census$ID), "popid"] <- NA
-                        
+census[is.na(census$ID), "popid"] <- NA
+names(census)[2] <- "session_day"
+
 # fill in sex variable
 fill_in_sex <- function(x){
     if (x["Sex"] == "") {
@@ -31,7 +34,7 @@ mating <- read.csv("data/raw/mating_data.csv", stringsAsFactors = FALSE, na.stri
                                  mutate(sex_ratio = as.factor(ifelse(Population == "A" | Population == "E" | Population == "G", 0.5,
                                  ifelse(Population == "B" | Population == "F" | Population == "H", 0.75, 0.25)))) %>%
                                  rename(session_day = Day_of_1st_session) 
-
+names(mating)[2] <- "session_day"
 # transform all variable names to lowercase
 out <- lapply(list(census, mating, morphometrics), function(x){
     names(x) <- tolower(names(x))
@@ -48,7 +51,10 @@ mating <- mating %>% mutate(population = as.factor(population))
 
 mating_over_time <- mating %>% 
                 group_by(sex_ratio, session_day, population) %>%
-                summarise(matings = sum(mating, na.rm = TRUE)) 
+                summarise(matings = sum(mating, na.rm = TRUE)) %>%
+                filter(population != "A" & population != "B" & population != "C")
+
+
 
 means <- aggregate(matings ~ sex_ratio, mating_over_time, mean)
 
@@ -70,6 +76,14 @@ d <- ggplot(mating_over_time, aes(x = sex_ratio, y = matings)) +
         axis.line.y = element_line(colour = 'grey', size=0.5, linetype='solid'),
         axis.title.y=element_text(margin=margin(0,20,0,0)),
         axis.title.x=element_text(margin=margin(20,0,0,0)))
+
+
+library(lme4)
+
+mod1 <- glmer(data = mating_over_time, formula = matings ~ sex_ratio + (1|session_day) + (1|population), family = "poisson")
+summary(mod1)
+
+plot(mod1)
 
 ggplot2::ggsave(d, 
     filename = "matings_per_sexratio.jpg", 
